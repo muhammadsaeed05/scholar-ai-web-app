@@ -20,17 +20,21 @@ export async function handleSummarize(paperText: string) {
   }
 }
 
-export async function handleSuggestFormatting(paperText: string): Promise<{ data: { suggestions: Record<string, string> } | null, error: string | null }> {
+interface SectionSuggestion {
+  sectionName: string;
+  suggestion: string;
+}
+
+export async function handleSuggestFormatting(paperText: string): Promise<{ data: { suggestions: SectionSuggestion[] } | null, error: string | null }> {
   if (!paperText.trim()) {
     return { data: null, error: "Paper content cannot be empty." };
   }
   try {
     const input: SuggestFormattingInput = { paperContent: paperText };
     const result: SuggestFormattingOutput = await suggestFormatting(input);
-    return { data: { suggestions: result.suggestedSections }, error: null };
+    return { data: { suggestions: result.suggestions }, error: null };
   } catch (e) {
     console.error("Error in handleSuggestFormatting:", e);
-    // Check if e is an error object and has a message property
     const errorMessage = e instanceof Error ? e.message : "Failed to get formatting suggestions. Please try again.";
     return { data: null, error: errorMessage };
   }

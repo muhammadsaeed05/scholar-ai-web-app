@@ -5,8 +5,8 @@
  * @fileOverview Formatting suggestion flow for research papers.
  *
  * This file defines a Genkit flow that analyzes the content and structure of a research paper
- * to provide formatting suggestions as a structured JSON object, where keys are section names
- * (e.g., "introduction", "methodology") and values are the corresponding suggestions.
+ * to provide formatting suggestions as an array of objects, where each object contains
+ * a section name and the corresponding suggestion.
  *
  * @exports suggestFormatting - The main function to trigger the formatting suggestion flow.
  * @exports SuggestFormattingInput - The input type for the suggestFormatting function.
@@ -25,12 +25,24 @@ const SuggestFormattingInputSchema = z.object({
 
 export type SuggestFormattingInput = z.infer<typeof SuggestFormattingInputSchema>;
 
+// Define the schema for a single suggestion
+const SectionSuggestionSchema = z.object({
+  sectionName: z
+    .string()
+    .describe(
+      'The lowercase name of the identified section (e.g., "introduction", "methodology").'
+    ),
+  suggestion: z
+    .string()
+    .describe('The suggested content or structure for this section.'),
+});
+
 // Define the output schema
 const SuggestFormattingOutputSchema = z.object({
-  suggestedSections: z
-    .record(z.string(), z.string())
+  suggestions: z
+    .array(SectionSuggestionSchema)
     .describe(
-      'A JSON object where keys are lowercase section names (e.g., "introduction", "methodology") and values are the suggested content or structure for that section.'
+      'An array of objects, where each object represents a formatting suggestion for a specific section of the paper.'
     ),
 });
 
@@ -52,18 +64,31 @@ const suggestFormattingPrompt = ai.definePrompt({
 
   For each identified section, provide a brief suggestion for its content or structure.
 
-  Return your suggestions as a JSON object with a top-level key "suggestedSections". The value of "suggestedSections" must be an object where keys are lowercase section names (e.g., "introduction", "methodology") and values are the suggested content or structure for that section.
+  Return your suggestions as a JSON object with a top-level key "suggestions".
+  The value of "suggestions" must be an array of objects. Each object in the array must have two keys:
+  1. "sectionName": A string representing the lowercase name of the section (e.g., "introduction", "methodology").
+  2. "suggestion": A string containing the suggested content or structure for that section.
 
   Example Output:
   {
-    "suggestedSections": {
-      "abstract": "A concise summary of the paper's objectives, methods, key findings, and conclusions.",
-      "introduction": "Provide background information, state the problem, and outline the paper's objectives and scope.",
-      "methodology": "Describe the research design, data collection methods, and analytical techniques used in detail."
-    }
+    "suggestions": [
+      {
+        "sectionName": "abstract",
+        "suggestion": "A concise summary of the paper's objectives, methods, key findings, and conclusions."
+      },
+      {
+        "sectionName": "introduction",
+        "suggestion": "Provide background information, state the problem, and outline the paper's objectives and scope."
+      },
+      {
+        "sectionName": "methodology",
+        "suggestion": "Describe the research design, data collection methods, and analytical techniques used in detail."
+      }
+    ]
   }
 
-  If no sections are applicable or cannot be determined from the content, the "suggestedSections" object should be empty (e.g., {}). Ensure the overall output is a valid JSON object matching this structure.
+  If no sections are applicable or cannot be determined from the content, the "suggestions" array should be empty (e.g., []).
+  Ensure the overall output is a valid JSON object matching this structure.
 
   Research Paper Content:
   {{paperContent}}
@@ -79,8 +104,7 @@ const suggestFormattingFlow = ai.defineFlow(
   },
   async input => {
     const {output} = await suggestFormattingPrompt(input);
-    // Ensure the output is not null, and if it's an empty object, it's still valid.
-    return output || { suggestedSections: {} };
+    // Ensure the output is not null, and if suggestions array is missing, default to empty array.
+    return output || { suggestions: [] };
   }
 );
-
