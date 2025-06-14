@@ -52,16 +52,18 @@ const suggestFormattingPrompt = ai.definePrompt({
 
   For each identified section, provide a brief suggestion for its content or structure.
 
-  Return your suggestions as a JSON object where each key is the lowercase name of the section (e.g., "introduction", "methodology") and the value is the suggested text for that section.
+  Return your suggestions as a JSON object with a top-level key "suggestedSections". The value of "suggestedSections" must be an object where keys are lowercase section names (e.g., "introduction", "methodology") and values are the suggested content or structure for that section.
 
   Example Output:
   {
-    "abstract": "A concise summary of the paper's objectives, methods, key findings, and conclusions.",
-    "introduction": "Provide background information, state the problem, and outline the paper's objectives and scope.",
-    "methodology": "Describe the research design, data collection methods, and analytical techniques used in detail."
+    "suggestedSections": {
+      "abstract": "A concise summary of the paper's objectives, methods, key findings, and conclusions.",
+      "introduction": "Provide background information, state the problem, and outline the paper's objectives and scope.",
+      "methodology": "Describe the research design, data collection methods, and analytical techniques used in detail."
+    }
   }
 
-  If a section is not applicable or cannot be determined from the content, do not include it in the JSON object. Ensure the output is a valid JSON object.
+  If no sections are applicable or cannot be determined from the content, the "suggestedSections" object should be empty (e.g., {}). Ensure the overall output is a valid JSON object matching this structure.
 
   Research Paper Content:
   {{paperContent}}
@@ -81,3 +83,4 @@ const suggestFormattingFlow = ai.defineFlow(
     return output || { suggestedSections: {} };
   }
 );
+
