@@ -1,7 +1,8 @@
+
 'use server';
 
 import { summarizeResearchPaper, type SummarizeResearchPaperInput } from '@/ai/flows/summarize-research-paper';
-import { suggestFormatting, type SuggestFormattingInput } from '@/ai/flows/suggest-formatting';
+import { suggestFormatting, type SuggestFormattingInput, type SuggestFormattingOutput } from '@/ai/flows/suggest-formatting';
 import { generatePaperTemplate, type GeneratePaperTemplateInput } from '@/ai/flows/generate-paper-template';
 import { contextualChatbot, type ContextualChatbotInput } from '@/ai/flows/contextual-chatbot';
 
@@ -19,17 +20,19 @@ export async function handleSummarize(paperText: string) {
   }
 }
 
-export async function handleSuggestFormatting(paperText: string) {
+export async function handleSuggestFormatting(paperText: string): Promise<{ data: { suggestions: Record<string, string> } | null, error: string | null }> {
   if (!paperText.trim()) {
     return { data: null, error: "Paper content cannot be empty." };
   }
   try {
     const input: SuggestFormattingInput = { paperContent: paperText };
-    const result = await suggestFormatting(input);
-    return { data: { suggestions: result.formattingSuggestions }, error: null };
+    const result: SuggestFormattingOutput = await suggestFormatting(input);
+    return { data: { suggestions: result.suggestedSections }, error: null };
   } catch (e) {
     console.error("Error in handleSuggestFormatting:", e);
-    return { data: null, error: "Failed to get formatting suggestions. Please try again." };
+    // Check if e is an error object and has a message property
+    const errorMessage = e instanceof Error ? e.message : "Failed to get formatting suggestions. Please try again.";
+    return { data: null, error: errorMessage };
   }
 }
 
