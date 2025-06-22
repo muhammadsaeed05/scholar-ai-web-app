@@ -5,7 +5,7 @@ import { ScholarAiHeader } from '@/components/scholar-ai/ScholarAiHeader';
 import { PaperInputClient } from '@/components/scholar-ai/PaperInputClient';
 import { SummarizationSectionClient } from '@/components/scholar-ai/SummarizationSectionClient';
 import { FormattingSuggestionsSectionClient } from '@/components/scholar-ai/FormattingSuggestionsSectionClient';
-import { TemplateGeneratorSectionClient } from '@/components/scholar-ai/TemplateGeneratorSectionClient';
+import { TemplatingSectionClient } from '@/components/scholar-ai/TemplateGeneratorSectionClient';
 import { ChatbotSectionClient } from '@/components/scholar-ai/ChatbotSectionClient';
 import { Separator } from '@/components/ui/separator';
 
@@ -64,7 +64,7 @@ export default function ScholarAiPage() {
                 <Separator className="my-6" />
                 <FormattingSuggestionsSectionClient paperText={paperText} />
                 <Separator className="my-6" />
-                <TemplateGeneratorSectionClient paperText={paperText} />
+                <TemplatingSectionClient paperText={paperText} />
                 <Separator className="my-6" />
                 <ChatbotSectionClient paperText={paperText} />
               </>
