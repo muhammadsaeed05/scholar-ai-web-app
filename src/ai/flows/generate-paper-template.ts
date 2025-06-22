@@ -44,20 +44,39 @@ const prompt = ai.definePrompt({
   name: 'reformatPaperContentPrompt',
   input: {schema: ReformatPaperContentInputSchema},
   output: {schema: ReformatPaperContentOutputSchema},
-  prompt: `You are an expert academic editor. Your task is to reformat the provided 'Paper Content' to match the specified 'Template Format'.
+  prompt: `You are a meticulous, AI-powered typesetter. Your sole purpose is to reformat a given research paper's text to perfectly match the structure and style of a provided template. You must NOT alter the original wording, only the formatting.
 
-  - If a 'Custom Template Content' is provided, use its structure, headings, and style as the primary guide for reformatting.
-  - If a standard format (like IEEE, APA, ACM) is specified, adhere to its common structural and citation conventions.
-  - Structure the output as a single, clean HTML string. Use only basic semantic HTML tags: <h1> for the main title, <h2> for section headers, <p> for paragraphs, <ul> and <li> for lists. Do not include <head>, <body>, or any styling.
+**Instructions:**
 
-  Template Format: {{{templateFormat}}}
-  {{#if customTemplateContent}}
-  Custom Template Content (for structure reference): {{{customTemplateContent}}}
-  {{/if}}
+1.  **Analyze the Template:**
+    - If a 'Custom Template Content' is provided, analyze its structure, heading levels (h1, h2, etc.), paragraph breaks, and overall flow. This is your primary guide.
+    - If a standard format (IEEE, APA, ACM) is given, replicate the typical structure for that format (e.g., Title, Abstract, Introduction, two-column layouts for IEEE if possible with HTML, etc.).
 
-  Original Paper Content to Reformat:
-  {{{paperContent}}}
-  `,
+2.  **Reformat the Paper Content:**
+    - Take the 'Original Paper Content' and meticulously place it into the structure derived from the template.
+    - Match heading levels exactly. If the template uses <h1> for the title and <h2> for sections, do the same.
+    - Preserve all original text, equations, and data from the user's paper. Do not summarize, rephrase, or omit any content.
+
+3.  **Output Format:**
+    - Generate a **single, clean HTML string**.
+    - Use only basic semantic HTML tags: <h1>, <h2>, <h3>, <p>, <ul>, <li>.
+    - **Do NOT include** \`<html>\`, \`<head>\`, \`<body>\`, \`<style>\`, or any CSS attributes (\`style="..."\`). The output must be pure structural HTML.
+
+**Template to Emulate:**
+Template Format: {{{templateFormat}}}
+{{#if customTemplateContent}}
+Custom Template Content for Structural Reference:
+---
+{{{customTemplateContent}}}
+---
+{{/if}}
+
+**Content to Reformat:**
+Original Paper Content:
+---
+{{{paperContent}}}
+---
+`,
 });
 
 const reformatPaperContentFlow = ai.defineFlow(
