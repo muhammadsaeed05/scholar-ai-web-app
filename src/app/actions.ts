@@ -21,13 +21,14 @@ export async function handleSummarize(paperText: string) {
   }
 }
 
-export async function handleSuggestFormatting(input: SuggestFormattingInput): Promise<{ data: SuggestFormattingOutput | null; error: string | null; }> {
-  if (!input.paperContent.trim()) {
+export async function handleSuggestFormatting(paperText: string): Promise<{ data: {suggestions: SuggestFormattingOutput['suggestions']} | null; error: string | null; }> {
+  if (!paperText.trim()) {
     return { data: null, error: "Paper content cannot be empty." };
   }
   try {
+    const input: SuggestFormattingInput = { paperContent: paperText };
     const result: SuggestFormattingOutput = await suggestFormatting(input);
-    return { data: result, error: null };
+    return { data: { suggestions: result.suggestions || [] }, error: null };
   } catch (e) {
     console.error("Error in handleSuggestFormatting:", e);
     const errorMessage = e instanceof Error ? e.message : "Failed to get formatting suggestions. Please try again.";
